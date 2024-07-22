@@ -1,8 +1,13 @@
-[gd_scene load_steps=10 format=3 uid="uid://bfy5ctccwmg44"]
+[gd_scene load_steps=15 format=3 uid="uid://bfy5ctccwmg44"]
 
 [ext_resource type="Texture2D" uid="uid://b0t1dh0bhvf6g" path="res://assets/sprites/slime_green.png" id="1_5wy15"]
 [ext_resource type="Script" path="res://scripts/slime.gd" id="1_yvl70"]
 [ext_resource type="PackedScene" uid="uid://cdinl3gukrbrc" path="res://scenes/killzone.tscn" id="2_8hlrb"]
+[ext_resource type="PackedScene" uid="uid://dgjwbvr8niws1" path="res://scenes/damagable.tscn" id="4_27yub"]
+[ext_resource type="PackedScene" uid="uid://nfxp5lnuc8xd" path="res://scenes/slime_collision.tscn" id="4_pyn2i"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_okye0"]
+friction = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_diouf"]
 atlas = ExtResource("1_5wy15")
@@ -19,6 +24,18 @@ region = Rect2(48, 24, 24, 24)
 [sub_resource type="AtlasTexture" id="AtlasTexture_jrxo2"]
 atlas = ExtResource("1_5wy15")
 region = Rect2(72, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w3dcp"]
+atlas = ExtResource("1_5wy15")
+region = Rect2(24, 48, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g4ntx"]
+atlas = ExtResource("1_5wy15")
+region = Rect2(48, 48, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xp2ck"]
+atlas = ExtResource("1_5wy15")
+region = Rect2(72, 48, 24, 24)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_sx4e0"]
 animations = [{
@@ -38,26 +55,37 @@ animations = [{
 "loop": true,
 "name": &"default",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w3dcp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g4ntx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xp2ck")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 12.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7x7hb"]
-size = Vector2(10, 13)
-
-[node name="Slime" type="Node2D"]
+[node name="Slime" type="RigidBody2D"]
+collision_layer = 0
+physics_material_override = SubResource("PhysicsMaterial_okye0")
+lock_rotation = true
 script = ExtResource("1_yvl70")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_sx4e0")
+animation = &"hurt"
 autoplay = "default"
-frame = 1
-frame_progress = 0.950573
 
 [node name="Killzone" parent="." instance=ExtResource("2_8hlrb")]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Killzone"]
-position = Vector2(0, -6.5)
-shape = SubResource("RectangleShape2D_7x7hb")
+[node name="CollisionShape2D" parent="Killzone" instance=ExtResource("4_pyn2i")]
 
 [node name="RayCastRight" type="RayCast2D" parent="."]
 position = Vector2(0, -6)
@@ -74,3 +102,11 @@ target_position = Vector2(-8, 0)
 [node name="RayCastLeftDown" type="RayCast2D" parent="."]
 position = Vector2(-8, -6)
 target_position = Vector2(0, 15)
+
+[node name="Damagable" parent="." instance=ExtResource("4_27yub")]
+
+[node name="CollisionShape2D2" parent="Damagable" instance=ExtResource("4_pyn2i")]
+
+[node name="CollisionShape2D" parent="." instance=ExtResource("4_pyn2i")]
+
+[connection signal="damaged" from="Damagable" to="." method="_on_damagable_damaged"]

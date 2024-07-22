@@ -1,13 +1,16 @@
 extends CharacterBody2D
 
 
+
 const SPEED = 130.0
 const JUMP_VELOCITY = -300.0
-const COYOTE_TIME = 3 # in frames
+const COYOTE_TIME = 2 # in frames
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var animated_sprite = $AnimatedSprite2D
+
+@onready var lightsaber = $Lightsaber
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -22,8 +25,11 @@ func _physics_process(delta):
 	# Flip the Sprite
 	if direction > 0:
 		animated_sprite.flip_h = false
+		lightsaber.scale = Vector2(1, 1)
 	elif direction < 0:
 		animated_sprite.flip_h = true
+		lightsaber.scale = Vector2(-1, 1)
+		
 		
 	# Play animations
 	if is_on_floor():

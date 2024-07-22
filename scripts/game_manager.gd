@@ -1,9 +1,12 @@
 extends Node
 
-var score = 0
+@onready var death_timer: Timer = $DeathTimer
 
-@onready var score_label = $ScoreLabel
+func reload_game():
+	Engine.time_scale = 0.5
+	death_timer.start()
 
-func add_point():
-	score += 1
-	score_label.text = "You collected " + str(score) + " coins!"
+
+func _on_death_timer_timeout() -> void:
+	Engine.time_scale = 1.0
+	get_tree().reload_current_scene()
